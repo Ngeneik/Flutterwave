@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+    <link rel="stylesheet" href="order.css">
+</head>
+<body>
+    <section id="order-form" class="order-form">
+        <div class="container">
+            <h2>Order Details</h2>
+            <form id="orderDetailsForm">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required>
+
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" required>
+
+                <label for="delivery">Delivery Option:</label>
+                <input type="radio" id="insideLagos" name="delivery" value="4000" required> Inside Lagos (₦4000)
+                <input type="radio" id="outsideLagos" name="delivery" value="6000" required> Outside Lagos (₦6000)
+
+                <button type="submit">Continue to Payment</button>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        // Retrieve stored product details
+        const productDetails = JSON.parse(sessionStorage.getItem('productDetails'));
+        if (!productDetails) {
+            alert('No product details found. Please start your order again.');
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('orderDetailsForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            const delivery = document.querySelector('input[name="delivery"]:checked').value;
+
+            // Store form and product data in session storage
+            sessionStorage.setItem('orderDetails', JSON.stringify({ name, email, phone, address, delivery, productDetails }));
+
+            // Redirect to the payment page
+            window.location.href = 'payment.html';
+        });
+    </script>
+</body>
+</html>

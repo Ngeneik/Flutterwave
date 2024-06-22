@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutterwave Payment Integration</title>
+    <link rel="stylesheet" href="payment.css">
+</head>
+<body>
+    <section id="inventory" class="inventory">
+        <div class="container">
+            <h2>Review Your Order</h2>
+            <div id="orderSummary"></div>
+            <button id="payNowBtn">Pay Now</button>
+        </div>
+    </section>
+
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script>
+        function generateTransactionRef() {
+            const timestamp = Date.now(); // Current timestamp
+            const randomNum = Math.floor(Math.random() * 1000000); // Random number
+            return `tx-ref-${timestamp}-${randomNum}`;
+        }
+
+        // Retrieve stored order details
+        const orderDetails = JSON.parse(sessionStorage.getItem('orderDetails'));
+        if (!orderDetails) {
+            alert('No order details found. Please start your order again.');
+            window.location.href = 'order.html';
+        }
+
+        const productPrice = parseInt(orderDetails.productDetails.price);
+        const totalAmount = productPrice + parseInt(orderDetails.delivery);
+
+        // Display order summary
+        document.getElementById('orderSummary').innerHTML = `
+            <p>Name: ${orderDetails.name}</p>
+            <p>Email: ${orderDetails.email}</p>
+            <p>Phone: ${orderDetails.phone}</p>
+            <p>Address: ${orderDetails.address}</p>
+            <p>Product: ${orderDetails.productDetails.description}</p>
+            <p>Product Price: ₦${productPrice}</p>
+            <p>Delivery Fee: ₦${orderDetails.delivery}</p>
+            <p>Total Amount: ₦${totalAmount}</p>
+        `;
+
+        document.getElementById('payNowBtn').addEventListener('click', function() {
+            FlutterwaveCheckout({
+                public_key: "FLWPUBK_TEST-e8b5e2ded4fa0d922f94f34ac2d6a4c7-X",
+                tx_ref: generateTransactionRef(),
+                amount: totalAmount,
+                currency: "NGN",
+                payment_options: "card, banktransfer, ussd",
+                redirect_url: "file:///C:/Users/NGENE%20IKECHUKWU/Documents/flutterwave/index.html",
+                meta: {
+                    consumer_id: "7898",
+                    consumer_mac: "kjs9s8ss7dd"
+                },
+                customer: {
+                    email: orderDetails.email,
+                    phone_number: orderDetails.phone,
+                    name: orderDetails.name
+                },
+                customizations: {
+                    title: "Product Purchase",
+                    description: `Payment for ${orderDetails.productDetails.description} including delivery fee`,
+                    // logo: "https://your-logo-url.com"
+                }
+            });
+        });
+    </script>
+</body>
+</html>
